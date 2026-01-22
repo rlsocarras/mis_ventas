@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de lista de Personas -->
+    <record id="view_ventas_viajes_persona_list" model="ir.ui.view">
+        <field name="name">ventas.viajes.persona.list</field>
+        <field name="model">ventas.viajes.persona</field>
+        <field name="arch" type="xml">
+            <list string="Personas">
+                <field name="nombre" width="250px"/>
+                <field name="contacto" width="250px"/>
+                <field name="total_deuda" width="200px"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Vista de formulario de Persona -->
+    <record id="view_ventas_viajes_persona_form" model="ir.ui.view">
+        <field name="name">ventas.viajes.persona.form</field>
+        <field name="model">ventas.viajes.persona</field>
+        <field name="arch" type="xml">
+            <form string="Persona">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="nombre"/>
+                            <field name="contacto"/>
+                        </group>
+                        <group>
+                            <field name="total_deuda" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <field name="deuda_ids">
+                        <list>
+                            <field name="viaje_id"/>
+                            <field name="producto_id"/>
+                            <field name="cantidad"/>
+                            <field name="monto"/>
+                            <field name="fecha_estimada_pago"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Acción para Personas -->
+    <record id="action_ventas_viajes_persona" model="ir.actions.act_window">
+        <field name="name">Personas</field>
+        <field name="res_model">ventas.viajes.persona</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

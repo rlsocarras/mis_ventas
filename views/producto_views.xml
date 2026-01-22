@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario de Producto -->
+    <record id="view_ventas_viajes_producto_form" model="ir.ui.view">
+        <field name="name">ventas.viajes.producto.form</field>
+        <field name="model">ventas.viajes.producto</field>
+        <field name="arch" type="xml">
+            <form string="Producto">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="cantidad"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group>
+                            <field name="precio_compra"/>
+                           
+                        </group>
+                        <group>
+                             <field name="precio_venta"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

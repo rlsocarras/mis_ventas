@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de lista de Viajes -->
+    <record id="view_ventas_viajes_viaje_list" model="ir.ui.view">
+        <field name="name">ventas.viajes.viaje.list</field>
+        <field name="model">ventas.viajes.viaje</field>
+        <field name="arch" type="xml">
+            <list string="Viajes">
+                <field name="name" />
+                <field name="fecha"/>
+                <field name="total_invertido"/>
+                <field name="total_ventas"/>
+                <field name="ganancia_real"/>
+                <field name="ganancia_potencial"/>
+            </list>
+        </field>
+    </record>
+    <!-- Vista KANBAN MUY SIMPLE -->
+    <record id="view_ventas_viajes_viaje_kanban" model="ir.ui.view">
+        <field name="name">ventas.viajes.viaje.kanban</field>
+        <field name="model">ventas.viajes.viaje</field>
+        <field name="arch" type="xml">
+            <kanban string="Viajes">
+                <field name="name"/>
+                <field name="total_invertido"/>
+                <field name="total_ventas"/>
+                <field name="ganancia_potencial"/>
+                <field name="total_efectivo"/>
+                <field name="total_transferencia"/>
+                <field name="total_deuda"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_card">
+                            <!-- Nombre resaltado -->
+                            <div class="bg-primary text-white p-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong t-esc="record.name.value"/>
+                                    </div>
+                                    <!-- Fecha con verificación segura -->
+                                    <div class="bg-light text-center py-1">
+                                        <small class="text-muted">
+                                            <i class="fa fa-calendar mr-1"></i>
+                                            <t t-if="record.fecha and record.fecha.value">
+                                                <t t-esc="record.fecha.value"/>
+                                    </t>
+                                            <t t-else="">
+                                        Sin fecha
+                                    </t>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Contenido -->
+                            <div class="p-2">
+                                <!-- Total Invertido -->
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Invertido:</span>
+                                    <span class="text-danger">$
+                                        <t t-esc="record.total_invertido.value"/>
+                                    </span>
+                                </div>
+                                <!-- Total Ventas -->
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Ventas:</span>
+                                    <span class="text-success">$
+                                        <t t-esc="record.total_ventas.value"/>
+                                    </span>
+                                </div>
+                                <!-- Ganancia Potencial -->
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Ganancia:</span>
+                                    <span t-att-class="record.ganancia_potencial.value >= 0 ? 'text-success' : 'text-danger'">
+                                        $
+                                        <t t-esc="record.ganancia_potencial.value"/>
+                                    </span>
+                                </div>
+                                <!-- Métodos de pago -->
+                                <div class="row text-center mt-2">
+                                    <div class="col-4">
+                                        <div class="small text-muted">Efectivo</div>
+                                        <div class="small">$
+                                            <t t-esc="record.total_efectivo.value"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="small text-muted">Transferencia</div>
+                                        <div class="small">$
+                                            <t t-esc="record.total_transferencia.value"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="small text-muted">Deudas</div>
+                                        <div class="small">$
+                                            <t t-esc="record.total_deuda.value"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <!-- Vista de formulario de Viaje -->
+    <record id="view_ventas_viajes_viaje_form" model="ir.ui.view">
+        <field name="name">ventas.viajes.viaje.form</field>
+        <field name="model">ventas.viajes.viaje</field>
+        <field name="arch" type="xml">
+            <form string="Viaje">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_compute_totals" type="object" class="btn-primary">
+                            <i class="fa fa-calculator"/> Calcular Totales
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="fecha"/>
+                        </group>
+                        <group>
+                            <field name="total_invertido" readonly="1"/>
+                            <field name="total_ventas" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Productos">
+                            <field name="producto_ids">
+                                <list colors="green:por_vender=='0'">
+                                    <field name="name" width="200px"/>
+                                    <field name="cantidad" width="150px"/>
+                                    <field name="precio_compra" width="200px"/>
+                                    <field name="precio_venta" width="200px"/>
+                                    <field name="cantidad_vendido" width="200px"/>
+                                    <field name="por_vender" width="200px" />
+                                    <field name="ganancia_actual" width="200px"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Ventas">
+                            <field name="venta_ids"  domain="[('state', '!=', 'borrador')]"> 
+                                <list>
+                                    <field name="producto_id" width="200px" />
+                                    <field name="cantidad" width="50px" class="text-center"/>
+                                    <field name="tipo_pago" width="200px"/>
+                                    <field name="monto_total" width="200px"/>
+                                    <field name="fecha" width="200px"/>
+                                    <field name="state" width="200px"/>
+                                </list>
+                                <form string="Venta">
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="producto_id"/>
+                                            </group>
+                                            <group>
+                                                <field name="cantidad"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <group>
+                                                <field name="tipo_pago"/>
+                                            </group>
+                                            <group>
+                                                <field name="fecha"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="monto_total" readonly="1"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Deudas">
+                            <field name="deuda_ids">
+                                <list>
+                                    <field name="persona_id" width="150px"/>
+                                    <field name="producto_id" width="150px"/>
+                                    <field name="cantidad" width="50px"/>
+                                    <field name="monto" width="100px"/>
+                                    <field name="fecha_estimada_pago" width="200px"/>
+                                    <field name="state" width="200px"/>
+                                </list>
+                                <form string="Deuda">
+                                    <header>
+                                        <group>
+                                            <group>
+                                                <field name="viaje_id" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="state" widget="statusbar" statusbar_visible="pendiente,pagada,vencida"/>
+                                            </group>
+                                        </group>
+                                    </header>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="persona_id"/>
+                                                <field name="cantidad"/>
+                                            </group>
+                                            <group>
+                                                <field name="producto_id"/>
+                                                <field name="fecha_estimada_pago"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="monto" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <button name="action_pagar_deuda" string="Pagar Deuda" type="object" class="btn-primary"
+                            invisible="state != 'pendiente'"/>
+                                            <!-- Botón Pago Parcial - visible cuando hay saldo pendiente -->
+                                            <button name="action_pago_parcial" string="Pago Parcial" type="object" class="btn-info"
+                            invisible="monto_pendiente &lt;= 0"/>
+                                            <button name="action_reabrir_deuda" string="Reabrir Deuda" type="object" class="btn-secondary"
+                            invisible="state == 'pendiente'"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Estadísticas">
+                            <group>
+                                <group>
+                                    <!-- Resumen Financiero -->
+                                    <div>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Total Invertido:</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="total_invertido" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Total Ventas Efectivo:</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="total_efectivo" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Total Ventas Transferencia:</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="total_transferencia" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Total Ventas Deuda:</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="total_deuda" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Total Ventas:</strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="total_ventas" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                        <hr/>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Ganancia Real:</strong>
+                                                <br/>
+                                                <small>Basada en productos vendidos</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="ganancia_real" nolabel="1"/>
+                                                <small>
+                                                    <field name="porcentaje_ganancia_real" nolabel="1"/>%
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-6">
+                                                <strong>Ganancia Potencial:</strong>
+                                                <br/>
+                                                <small>Ventas totales - Inversión total</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <field name="ganancia_potencial" nolabel="1"/>
+                                                <small>
+                                                    <field name="porcentaje_ganancia_potencial" nolabel="1"/>%
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Vista Graph para estadísticas -->
+    <record id="view_ventas_viajes_viaje_graph" model="ir.ui.view">
+        <field name="name">ventas.viajes.viaje.graph</field>
+        <field name="model">ventas.viajes.viaje</field>
+        <field name="arch" type="xml">
+            <graph string="Estadísticas de Viajes">
+                <field name="fecha" type="row"/>
+                <field name="total_invertido" type="measure"/>
+                <field name="total_ventas" type="measure"/>
+                <field name="ganancia_real" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <!-- Vista Pivot para análisis -->
+    <record id="view_ventas_viajes_viaje_pivot" model="ir.ui.view">
+        <field name="name">ventas.viajes.viaje.pivot</field>
+        <field name="model">ventas.viajes.viaje</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Viajes">
+                <field name="fecha" type="row"/>
+                <field name="name" type="col"/>
+                <field name="total_invertido" type="measure"/>
+                <field name="total_ventas" type="measure"/>
+                <field name="ganancia_real" type="measure"/>
+                <field name="total_deuda" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <!-- Acción para Viajes -->
+    <record id="action_ventas_viajes_viaje" model="ir.actions.act_window">
+        <field name="name">Viajes</field>
+        <field name="res_model">ventas.viajes.viaje</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+    </record>
+</odoo>

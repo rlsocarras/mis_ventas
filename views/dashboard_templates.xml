@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Template para el Dashboard -->
+    <template id="dashboard_template" inherit_id="web.layout" name="Dashboard Template">
+        <xpath expr="//t[@t-name='Layout']//div[hasclass('o_action_manager')]" position="inside">
+            <t t-if="action and action.xml_id == 'mis_ventas.action_ventas_viajes_viaje'">
+                <!-- Contenedor principal del Dashboard -->
+                <div class="container-fluid mt-3" id="ventas_viajes_dashboard">
+                    
+                    <!-- Fila 1: Métricas principales -->
+                    <div class="row">
+                        <!-- Tarjeta 1: Viajes Totales -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Viajes Totales
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <t t-esc="len(records)"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-road fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 2: Total Invertido -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Total Invertido
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                $<t t-esc="'{:,.2f}'.format(sum(record.total_invertido for record in records))"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 3: Total Ventas -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Total Ventas
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                $<t t-esc="'{:,.2f}'.format(sum(record.total_ventas for record in records))"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 4: Ganancia Total -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Ganancia Total
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold" 
+                                                 t-att-class="'text-success' if sum(record.ganancia_real for record in records) >= 0 else 'text-danger'">
+                                                $<t t-esc="'{:,.2f}'.format(sum(record.ganancia_real for record in records))"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila 2: Métodos de Pago y Deudas -->
+                    <div class="row">
+                        <!-- Métodos de Pago -->
+                        <div class="col-xl-6 col-lg-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Distribución por Método de Pago</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 text-center">
+                                            <div class="metric-card">
+                                                <div class="metric-value text-success">
+                                                    $<t t-esc="'{:,.2f}'.format(sum(record.total_efectivo for record in records))"/>
+                                                </div>
+                                                <div class="metric-label">Efectivo</div>
+                                                <div class="metric-percentage">
+                                                    <t t-set="total_pagos" t-value="sum(record.total_efectivo for record in records) + sum(record.total_transferencia for record in records)"/>
+                                                    <t t-if="total_pagos > 0">
+                                                        <t t-esc="round(sum(record.total_efectivo for record in records) / total_pagos * 100, 1)"/>%
+                                                    </t>
+                                                    <t t-else="">0%</t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <div class="metric-card">
+                                                <div class="metric-value text-info">
+                                                    $<t t-esc="'{:,.2f}'.format(sum(record.total_transferencia for record in records))"/>
+                                                </div>
+                                                <div class="metric-label">Transferencia</div>
+                                                <div class="metric-percentage">
+                                                    <t t-if="total_pagos > 0">
+                                                        <t t-esc="round(sum(record.total_transferencia for record in records) / total_pagos * 100, 1)"/>%
+                                                    </t>
+                                                    <t t-else="">0%</t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <div class="metric-card">
+                                                <div class="metric-value text-warning">
+                                                    $<t t-esc="'{:,.2f}'.format(sum(record.total_deuda for record in records))"/>
+                                                </div>
+                                                <div class="metric-label">Deudas Pendientes</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deudas por Vencer -->
+                        <div class="col-xl-6 col-lg-6 mb-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Resumen de Viajes</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="small-box bg-success p-3 rounded">
+                                                <h4 class="mb-0">
+                                                    <t t-esc="len([r for r in records if r.ganancia_real > 0])"/>
+                                                </h4>
+                                                <p class="mb-0">Viajes con Ganancia</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="small-box bg-danger p-3 rounded">
+                                                <h4 class="mb-0">
+                                                    <t t-esc="len([r for r in records if r.ganancia_real &lt;= 0])"/>
+                                                </h4>
+                                                <p class="mb-0">Viajes con Pérdida</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            <t t-esc="len([r for r in records if r.total_deuda > 0])"/> viajes tienen deudas pendientes
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila 3: Lista de Viajes -->
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Resumen de Viajes</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover table-sm" width="100%" cellspacing="0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Viaje</th>
+                                                    <th>Fecha</th>
+                                                    <th>Invertido</th>
+                                                    <th>Ventas</th>
+                                                    <th>Ganancia Real</th>
+                                                    <th>Ganancia Potencial</th>
+                                                    <th>Deuda</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="records" t-as="viaje">
+                                                    <tr class="clickable-row" 
+                                                        t-att-data-href="'/web#id=' + viaje.id + '&amp;model=ventas.viajes.viaje&amp;view_type=form'"
+                                                        style="cursor: pointer;">
+                                                        <td>
+                                                            <strong t-esc="viaje.name"/>
+                                                        </td>
+                                                        <td><t t-esc="viaje.fecha"/></td>
+                                                        <td class="text-right">$<t t-esc="'{:,.2f}'.format(viaje.total_invertido)"/></td>
+                                                        <td class="text-right">$<t t-esc="'{:,.2f}'.format(viaje.total_ventas)"/></td>
+                                                        <td class="text-right" t-att-class="'text-success' if viaje.ganancia_real >= 0 else 'text-danger'">
+                                                            $<t t-esc="'{:,.2f}'.format(viaje.ganancia_real)"/>
+                                                        </td>
+                                                        <td class="text-right" t-att-class="'text-success' if viaje.ganancia_potencial >= 0 else 'text-danger'">
+                                                            $<t t-esc="'{:,.2f}'.format(viaje.ganancia_potencial)"/>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-if="viaje.total_deuda > 0" class="badge badge-warning">
+                                                                $<t t-esc="'{:,.2f}'.format(viaje.total_deuda)"/>
+                                                            </span>
+                                                            <span t-else="" class="badge badge-success">$0.00</span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-if="viaje.ganancia_real >= viaje.total_invertido * 0.3" 
+                                                                  class="badge badge-success">Excelente</span>
+                                                            <span t-elif="viaje.ganancia_real >= 0" 
+                                                                  class="badge badge-info">Bueno</span>
+                                                            <span t-elif="viaje.ganancia_real >= viaje.total_invertido * -0.2" 
+                                                                  class="badge badge-warning">Regular</span>
+                                                            <span t-else="" 
+                                                                  class="badge badge-danger">Crítico</span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila 4: Indicadores -->
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                ROI Promedio
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <t t-set="total_invertido" t-value="sum(record.total_invertido for record in records)"/>
+                                                <t t-set="total_ganancia" t-value="sum(record.ganancia_real for record in records)"/>
+                                                <t t-if="total_invertido > 0">
+                                                    <t t-esc="round((total_ganancia / total_invertido) * 100, 1)"/>%
+                                                </t>
+                                                <t t-else="">0%</t>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Deuda / Ventas
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <t t-set="total_deudas" t-value="sum(record.total_deuda for record in records)"/>
+                                                <t t-set="total_ventas_gral" t-value="sum(record.total_ventas for record in records)"/>
+                                                <t t-if="total_ventas_gral > 0">
+                                                    <t t-esc="round((total_deudas / total_ventas_gral) * 100, 1)"/>%
+                                                </t>
+                                                <t t-else="">0%</t>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Ventas Promedio por Viaje
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                $<t t-if="len(records) > 0" t-esc="'{:,.2f}'.format(sum(record.total_ventas for record in records) / len(records))"/>
+                                                <t t-else="">$0.00</t>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JavaScript para interactividad -->
+                <script>
+                    // Hacer las filas clickeables
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const rows = document.querySelectorAll('.clickable-row');
+                        rows.forEach(row => {
+                            row.addEventListener('click', function() {
+                                window.location.href = this.dataset.href;
+                            });
+                        });
+                    });
+                </script>
+
+                <!-- Estilos CSS para el dashboard -->
+                <style>
+                    .metric-card {
+                        padding: 15px;
+                        border-radius: 8px;
+                        background: #f8f9fa;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .metric-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    }
+                    
+                    .metric-value {
+                        font-size: 24px;
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .metric-label {
+                        font-size: 14px;
+                        color: #6c757d;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .metric-percentage {
+                        font-size: 12px;
+                        color: #28a745;
+                        font-weight: bold;
+                    }
+                    
+                    .small-box {
+                        color: white;
+                        border-radius: 5px;
+                        text-align: center;
+                    }
+                    
+                    .small-box.bg-success {
+                        background: linear-gradient(45deg, #28a745, #20c997);
+                    }
+                    
+                    .small-box.bg-danger {
+                        background: linear-gradient(45deg, #dc3545, #e83e8c);
+                    }
+                    
+                    .small-box h4 {
+                        font-size: 28px;
+                        margin: 0;
+                    }
+                    
+                    .small-box p {
+                        font-size: 14px;
+                        opacity: 0.9;
+                    }
+                    
+                    .clickable-row:hover {
+                        background-color: #f8f9fa !important;
+                    }
+                    
+                    .badge {
+                        font-size: 0.8em;
+                        padding: 0.4em 0.8em;
+                    }
+                    
+                    .table th {
+                        border-top: none;
+                        font-weight: 600;
+                    }
+                    
+                    .card {
+                        border: none;
+                        border-radius: 10px;
+                        overflow: hidden;
+                    }
+                    
+                    .card-header {
+                        background-color: #fff;
+                        border-bottom: 1px solid #e3e6f0;
+                    }
+                </style>
+            </t>
+        </xpath>
+    </template>
+</odoo>
