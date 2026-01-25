@@ -1,0 +1,9 @@
+RESUMEN DE CARDINALIDADES
+Relación	Tipo	Cardinalidad	Descripción
+Viaje → ViajeProducto	One2many	1:N	Un viaje tiene muchos productos
+Producto → ViajeProducto	One2many	1:N	Un producto está en muchos viajes
+ViajeProducto → Venta	One2many	1:N	Un producto-viaje tiene muchas ventas
+ViajeProducto → Deuda	One2many	1:N	Un producto-viaje genera muchas deudas
+Venta → Deuda	Many2one	1:1	Una venta a crédito genera una deuda
+Persona → Deuda	One2many	1:N	Una persona tiene muchas deudas
+Deuda → PagoDeuda	One2many	1:N	Una deuda tiene muchos pagos

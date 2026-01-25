@@ -1,177 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Vista de lista de Deudas -->
-    <record id="view_ventas_viajes_deuda_list" model="ir.ui.view">
-        <field name="name">ventas.viajes.deuda.list</field>
-        <field name="model">ventas.viajes.deuda</field>
+    <!-- Vista Lista -->
+    <record id="deuda_list_view" model="ir.ui.view">
+        <field name="name">ventas.deuda.list</field>
+        <field name="model">ventas.deuda</field>
         <field name="arch" type="xml">
-            <list string="Deudas">
-                <field name="persona_id"/>
+            <list>
                 <field name="viaje_id"/>
-                <field name="producto_id"/>
+                <field name="persona_id"/>
+                <field name="viaje_producto_id"/>
                 <field name="cantidad"/>
-                <field name="monto"/>
-                <field name="monto_pagado"/>
-                <field name="monto_pendiente"/>
-                <field name="state" widget="badge"/>
-                
-                <!-- Botón Pago Parcial - visible cuando hay saldo pendiente -->
-                <button name="action_pago_parcial" string="Pago Parcial" type="object" class="btn-info"
-                        invisible="monto_pendiente &lt;= 0"/>
-                
-                <!-- Botón Pagar Todo - visible cuando hay saldo pendiente -->
-                <button name="action_pagar_deuda" string="Pagar Todo" type="object" class="btn-primary"
-                        invisible="monto_pendiente &lt;= 0"/>
-                
-                <!-- Botón Marcar Vencida - solo para deudas pendientes -->
-                <button name="action_marcar_vencida" string="Vencida" type="object" class="btn-warning"
-                        invisible="state != 'pendiente'"/>
-                
-                <!-- Botón Reabrir - para deudas pagadas o vencidas -->
-                <button name="action_reabrir_deuda" string="Reabrir" type="object" class="btn-secondary"
-                        invisible="state not in ['pagada', 'vencida']"/>
+                <field name="monto_total" sum="Monto Total"/>
+                <field name="monto_pendiente" sum="Monto Pendiente"/>
+                <field name="total_pagado" sum="Monto Pagado"/>
+                <field name="estado" widget="badge"
+                       decoration-success="estado=='pagado'"
+                       decoration-warning="estado=='parcial'"
+                       decoration-danger="estado == 'pendiente' or estado == 'vencida'"/>
+                <field name="fecha_estimada_pago"/>
+                <field name="dias_vencimiento"/>
+                <button 
+                    name="action_registrar_pago" 
+                    type="object" 
+                    string="Pagar"
+                    class="btn-primary"
+                    icon="fa-money"
+                    invisible="monto_pendiente &lt;= 0"
+                />
             </list>
         </field>
     </record>
-    
-    <!-- Vista de formulario de Deuda -->
-    <record id="view_ventas_viajes_deuda_form" model="ir.ui.view">
-        <field name="name">ventas.viajes.deuda.form</field>
-        <field name="model">ventas.viajes.deuda</field>
+    <!-- Vista Formulario -->
+    <record id="deuda_form_view" model="ir.ui.view">
+        <field name="name">ventas.deuda.form</field>
+        <field name="model">ventas.deuda</field>
         <field name="arch" type="xml">
-            <form string="Deuda">
+            <form>
                 <header>
-                    <!-- Botón Pago Parcial - visible cuando hay saldo pendiente -->
-                    <button name="action_pago_parcial" string="Pago Parcial" type="object" class="btn-info"
-                            invisible="monto_pendiente &lt;= 0"/>
-                    
-                    <!-- Botón Pagar Todo - visible cuando hay saldo pendiente -->
-                    <button name="action_pagar_deuda" string="Pagar Todo" type="object" class="btn-primary"
-                            invisible="monto_pendiente &lt;= 0"/>
-                    
-                    <!-- Botón Marcar Vencida - solo para deudas pendientes -->
-                    <button name="action_marcar_vencida" string="Marcar Vencida" type="object" class="btn-warning"
-                            invisible="state != 'pendiente'"/>
-                    
-                    <!-- Botón Reabrir - para deudas pagadas o vencidas -->
-                    <button name="action_reabrir_deuda" string="Reabrir Deuda" type="object" class="btn-secondary"
-                            invisible="state not in ['pagada', 'vencida']"/>
-                    
-                    <field name="state" widget="statusbar" statusbar_visible="pendiente,parcial,pagada,vencida"/>
+                    <button 
+                        name="action_registrar_pago" 
+                        type="object" 
+                        string="Registrar Pago"
+                        class="btn-primary"
+                        invisible="monto_pendiente &lt;= 0"
+                    />
+                    <field name="estado" widget="statusbar" 
+                           statusbar_visible="pendiente,parcial,pagado,vencida"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <!-- Botón en la caja de botones - también con condiciones -->
-                        <button name="action_pago_parcial" type="object" class="oe_stat_button" icon="fa-money"
-                                invisible="monto_pendiente &lt;= 0">
-                            <div class="o_stat_info">
-                                <span class="o_stat_text">Pago Parcial</span>
-                            </div>
-                        </button>
-                    </div>
-                    
-                    <div class="oe_title">
-                        <h1>
-                            <field name="display_name" readonly="1" nolabel="1"/>
-                        </h1>
-                    </div>
-                    
+                    <group>
+                        <field name="viaje_id" />
+                    </group>
                     <group>
                         <group>
                             <field name="persona_id"/>
-                            <field name="viaje_id"/>
-                            <field name="producto_id"/>
                             <field name="cantidad"/>
+                            <field name="total_pagado" widget="monetary" readonly="1"/>
+                            
                         </group>
                         <group>
-                            <field name="monto" readonly="1"/>
-                            <field name="monto_pagado"/>
+                            <field name="viaje_producto_id" />
+                            <field name="fecha_estimada_pago"/>
+                            <field name="monto_total" widget="monetary" readonly="1"/>
+                            
                             <field name="monto_pendiente" widget="monetary" readonly="1"/>
                         </group>
+                        <field name="fecha_creacion" readonly="1"/>
                     </group>
-                    
-                    <group>
-                        <group>
-                            <field name="fecha"/>
-                            <field name="fecha_estimada_pago"/>
-                            <field name="fecha_pago"/>
-                        </group>
-                        <group>
-                            <field name="venta_id"/>
-                        </group>
-                    </group>
-                    
                     <notebook>
-                        <page string="Pagos Parciales">
-                            <field name="ventas_parciales_ids">
-                                <list string="Ventas por Pagos Parciales">
-                                    <field name="fecha"/>
-                                    <field name="monto_total"/>
+                        <page string="Pagos">
+                            <field name="pagos_ids">
+                                <list>
+                                    <field name="fecha_pago"/>
+                                    <field name="monto" widget="monetary"/>
                                     <field name="tipo_pago"/>
-                                    <field name="state" widget="badge"/>
                                 </list>
                             </field>
+                        </page>
+                        <page string="Información">
+                            <!-- CORRECCIÓN: Sin t-if, usar invisible con condiciones -->
+                            <div class="alert alert-info" invisible="estado != 'pendiente'">
+                                <strong>Deuda Pendiente:</strong> Aún no se han realizado pagos.
+                            </div>
+                            <div class="alert alert-warning" invisible="estado != 'parcial'">
+                                <strong>Pago Parcial:</strong> Se ha pagado parte de la deuda.
+                            </div>
+                            <div class="alert alert-success" invisible="estado != 'pagado'">
+                                <strong>¡Deuda Pagada!</strong> Esta deuda ha sido completamente saldada.
+                            </div>
+                            <div class="alert alert-danger" invisible="estado != 'vencida'">
+                                <strong>Deuda Vencida:</strong> La fecha estimada de pago ha pasado.
+                            </div>
                         </page>
                     </notebook>
                 </sheet>
             </form>
         </field>
     </record>
-    
-    <!-- Búsqueda de Deudas -->
-    <record id="view_ventas_viajes_deuda_search" model="ir.ui.view">
-        <field name="name">ventas.viajes.deuda.search</field>
-        <field name="model">ventas.viajes.deuda</field>
+    <!-- Búsqueda -->
+    <record id="deuda_search_view" model="ir.ui.view">
+        <field name="name">ventas.deuda.search</field>
+        <field name="model">ventas.deuda</field>
         <field name="arch" type="xml">
-            <search string="Buscar Deudas">
+            <search>
+                <!-- Panel de busqueda -->
+                <searchpanel>
+                    <field name="viaje_id"  string="Viajes" icon="fa-building" enable_counters="1" select="multi"/>
+                    <field name="persona_id" string="Personas" icon='fa-user' enable_counters="1"/>
+                    <field name="estado" string="Estado" icon='fa-state' enable_counters="1" select="multi"/>
+                    <field name="viaje_producto_id" string="Producto" icon='fa-product' enable_counters="1"/>
+                </searchpanel>
                 <field name="persona_id"/>
                 <field name="viaje_id"/>
-                <field name="producto_id"/>
-                <filter string="Pendientes" name="pendientes" domain="[('state', '=', 'pendiente')]"/>
-                <filter string="Pago Parcial" name="parcial" domain="[('state', '=', 'parcial')]"/>
-                <filter string="Pagadas" name="pagadas" domain="[('state', '=', 'pagada')]"/>
-                <filter string="Vencidas" name="vencidas" domain="[('state', '=', 'vencida')]"/>
+                <field name="estado"/>
+                <filter name="filter_pendientes" string="Pendientes" 
+                        domain="[('estado', 'in', ['pendiente', 'vencida'])]"/>
+                <filter name="filter_parciales" string="Parciales" 
+                        domain="[('estado', '=', 'parcial')]"/>
+                <filter name="filter_pagadas" string="Pagadas" 
+                        domain="[('estado', '=', 'pagado')]"/>
+                <filter name="filter_vencidas" string="Vencidas" 
+                        domain="[('estado', '=', 'vencida')]"/>
             </search>
         </field>
     </record>
-    
-    <!-- Vista para el Wizard de Pago Parcial -->
-    <record id="view_pago_parcial_wizard_form" model="ir.ui.view">
-        <field name="name">ventas.viajes.pago.parcial.wizard.form</field>
-        <field name="model">ventas.viajes.pago.parcial.wizard</field>
-        <field name="arch" type="xml">
-            <form string="Registrar Pago Parcial">
-                <sheet>
-                    <div class="oe_title">
-                        <h1>Registrar Pago Parcial</h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="deuda_id" widget="many2one_avatar" readonly="1"/>
-                            <field name="persona_id" readonly="1"/>
-                            <field name="monto_total" readonly="1"/>
-                            <field name="monto_pagado" readonly="1"/>
-                            <field name="monto_pendiente" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="monto" string="Monto a Pagar" required="1"/>
-                            <field name="descripcion"/>
-                        </group>
-                    </group>
-                    <footer>
-                        <button name="action_confirmar_pago" string="Registrar Pago" type="object" class="btn-primary"/>
-                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
-                    </footer>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    
-    <!-- Acción para Deudas -->
-    <record id="action_ventas_viajes_deuda" model="ir.actions.act_window">
+    <!-- Acción -->
+    <record id="action_deuda" model="ir.actions.act_window">
         <field name="name">Deudas</field>
-        <field name="res_model">ventas.viajes.deuda</field>
+        <field name="res_model">ventas.deuda</field>
         <field name="view_mode">list,form</field>
-        <field name="search_view_id" ref="view_ventas_viajes_deuda_search"/>
+        <field name="search_view_id" ref="deuda_search_view"/>
     </record>
 </odoo>

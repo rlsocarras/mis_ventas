@@ -1,0 +1,219 @@
+classDiagram
+    %% CLASE PRINCIPAL: VIAJE
+    class Viaje {
+        +String _name = "ventas.viaje"
+        +String _description = "Viaje"
+        +String _rec_name = "nombre"
+        +String _order = "fecha desc"
+        
+        # Campos
+        +String nombre
+        +Date fecha
+        +Float total_invertido
+        +Float ganancia_total_potencial
+        +Float ganancia_total_real
+        +Float total_efectivo
+        +Float total_transferencia
+        +Float total_deuda
+        +String estado
+        +Float comision_vendedor
+        +Float total_comisiones
+        
+        # Relaciones
+        +ViajeProducto[] viaje_producto_ids
+        +Venta[] ventas_ids
+        +Deuda[] deudas_ids
+        
+        # Métodos
+        +_compute_totales() void
+        +_compute_estado() void
+        +_compute_comisiones() void
+        +action_crear_venta() dict
+        +unlink() void
+    }
+    
+    %% CLASE: PRODUCTO
+    class Producto {
+        +String _name = "ventas.producto"
+        +String _description = "Producto"
+        +String _rec_name = "nombre"
+        
+        # Campos
+        +String nombre
+        +Text descripcion
+        
+        # Relaciones
+        +ViajeProducto[] viaje_producto_ids
+    }
+    
+    %% CLASE INTERMEDIA: VIAJE_PRODUCTO
+    class ViajeProducto {
+        +String _name = "ventas.viaje.producto"
+        +String _description = "Producto en Viaje"
+        +String _rec_name = "producto_id"
+        
+        # Campos
+        +Integer cantidad
+        +Float precio_compra
+        +Float precio_venta
+        +Integer cantidad_vendido
+        +Integer por_vender
+        +Float total_invertido
+        +Float total_ganancia_potencial
+        +Float ganancia_actual
+        
+        # Relaciones
+        +Viaje viaje_id
+        +Producto producto_id
+        +Venta[] ventas_ids
+        +Deuda[] deudas_ids
+        
+        # Métodos
+        +_compute_totales() void
+        +_compute_ventas() void
+        +_check_cantidad_no_negativa() void
+        +_check_precios_coherentes() void
+        
+        # Constraints SQL
+        +precio_compra_positivo
+        +precio_venta_positivo
+        +cantidad_positiva
+        +precio_venta_mayor_compra
+    }
+    
+    %% CLASE: PERSONA
+    class Persona {
+        +String _name = "ventas.persona"
+        +String _description = "Persona"
+        +String _rec_name = "nombre"
+        
+        # Campos
+        +String nombre
+        +String contacto
+        +Float total_deuda
+        +Float limite_credito
+        
+        # Relaciones
+        +Deuda[] deudas_ids
+        +Venta[] ventas_ids
+        
+        # Métodos
+        +_compute_total_deuda() void
+    }
+    
+    %% CLASE: VENTA
+    class Venta {
+        +String _name = "ventas.venta"
+        +String _description = "Venta"
+        +String _order = "fecha_venta desc"
+        +String _rec_name = "display_name"
+        
+        # Campos
+        +Integer cantidad
+        +Float precio_unitario
+        +Float total
+        +Float ganancia
+        +String tipo_pago
+        +Date fecha_estimada_pago
+        +Datetime fecha_venta
+        +String estado
+        +String display_name
+        
+        # Relaciones
+        +Viaje viaje_id
+        +ViajeProducto viaje_producto_id
+        +Producto producto_id
+        +Persona persona_id
+        +Deuda deuda_id
+        
+        # Métodos
+        +_compute_display_name() void
+        +_compute_total() void
+        +_compute_ganancia() void
+        +_compute_estado() void
+        +_onchange_tipo_pago() void
+        +_check_cantidad_disponible() void
+        +_check_fecha_venta_vs_viaje() void
+        +_check_limite_credito() void
+        
+        # Constraints
+        +cantidad_disponible
+    }
+    
+    %% CLASE: DEUDA
+    class Deuda {
+        +String _name = "ventas.deuda"
+        +String _description = "Deuda"
+        +String _order = "fecha_creacion desc"
+        +String _rec_name = "display_name"
+        +String[] _inherit = ["mail.thread", "mail.activity.mixin"]
+        
+        # Campos
+        +Integer cantidad
+        +Float monto_total
+        +Float monto_pendiente
+        +Float total_pagado
+        +Datetime fecha_creacion
+        +Date fecha_estimada_pago
+        +String estado
+        +Integer dias_vencimiento
+        +String display_name
+        
+        # Relaciones
+        +Persona persona_id
+        +ViajeProducto viaje_producto_id
+        +Viaje viaje_id
+        +Venta venta_id
+        +PagoDeuda[] pagos_ids
+        
+        # Métodos
+        +_compute_total() void
+        +_compute_pagos() void
+        +_compute_estado() void
+        +_compute_dias_vencimiento() void
+        +_compute_display_name() void
+        +action_registrar_pago() dict
+        +write(vals) void
+        +_check_fecha_estimada_pago() void
+    }
+    
+    %% CLASE: PAGO_DEUDA
+    class PagoDeuda {
+        +String _name = "ventas.pago.deuda"
+        +String _description = "Pago de Deuda"
+        +String _order = "fecha_pago desc"
+        
+        # Campos
+        +Float monto
+        +String tipo_pago
+        +Datetime fecha_pago
+        
+        # Relaciones
+        +Deuda deuda_id
+        +Persona persona_id
+        
+        # Métodos
+        +_check_monto_no_excede_deuda() void
+        
+        # Constraints
+        +monto_positivo
+    }
+    
+    %% HERENCIAS Y RELACIONES
+    Viaje "1" -- "*" ViajeProducto : contiene
+    Producto "1" -- "*" ViajeProducto : aparece_en
+    Viaje "1" -- "*" Venta : genera
+    Viaje "1" -- "*" Deuda : tiene_deudas
+    ViajeProducto "1" -- "*" Venta : vendido_en
+    ViajeProducto "1" -- "*" Deuda : genera_deuda
+    Persona "1" -- "*" Venta : realiza
+    Persona "1" -- "*" Deuda : debe
+    Venta "1" -- "1" Deuda : crea
+    Deuda "1" -- "*" PagoDeuda : recibe_pagos
+    
+    %% RELACIONES COMPUESTAS
+    Venta --> ViajeProducto : viaje_producto_id
+    Venta --> Producto : producto_id (related)
+    Deuda --> ViajeProducto : viaje_producto_id
+    Deuda --> Viaje : viaje_id (related)
+    PagoDeuda --> Persona : persona_id (related)

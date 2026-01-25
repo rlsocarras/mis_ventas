@@ -1,34 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Menú Principal -->
+    <menuitem 
+        id="menu_ventas_viajes" 
+        name="Mis ventas" 
+        sequence="10"
+    />
+    <menuitem 
+        id="menu_viajes" 
+        name="Viajes" 
+        parent="menu_ventas_viajes"
+        action="action_viaje"
+        sequence="10"
+    />
 
-   
+    <menuitem 
+        id="menu_ventas" 
+        name="Ventas" 
+        parent="menu_ventas_viajes"
+        action="action_venta"
+        sequence="20"
+    />
 
-    <!-- Menú principal -->
-    <menuitem id="menu_ventas_viajes_root" 
-              name="Ventas Viajes" 
-              sequence="10"/>
-    <!-- Submenús -->
-    <menuitem id="menu_ventas_viajes_viajes" 
-              name="Viajes" 
-              parent="menu_ventas_viajes_root" 
-              action="action_ventas_viajes_viaje"
-              sequence="10"/>
-    <menuitem id="menu_ventas_viajes_personas" 
-              name="Personas" 
-              parent="menu_ventas_viajes_root" 
-              action="action_ventas_viajes_persona"
-              sequence="20"/>
-    <menuitem id="menu_ventas_viajes_ventas" 
-              name="Ventas" 
-              parent="menu_ventas_viajes_root" 
-              action="action_ventas_viajes_venta"
-              sequence="30"/>
-    <menuitem id="menu_ventas_viajes_deudas" 
-              name="Deudas" 
-              parent="menu_ventas_viajes_root" 
-              action="action_ventas_viajes_deuda"
-              sequence="40"/>
+    <menuitem 
+        id="menu_deudas" 
+        name="Deudas" 
+        parent="menu_ventas_viajes"
+        action="action_deuda"
+        sequence="30"
+    />
+
+    <menuitem 
+        id="menu_personas" 
+        name="Personas" 
+        parent="menu_ventas_viajes"
+        action="action_persona"
+        sequence="40"
+    />
+    <menuitem 
+        id="menu_productos" 
+        name="Productos" 
+        parent="menu_ventas_viajes"
+        action="action_producto"
+        sequence="50"
+    />
+    <!-- Submenú Operaciones -->
+    <menuitem 
+        id="menu_operaciones" 
+        name="Operaciones" 
+        parent="menu_ventas_viajes"
+        sequence="60"
+    />
     
-
-   
+    <!-- Submenú Finanzas -->
+    <menuitem 
+        id="menu_finanzas" 
+        name="Finanzas" 
+        parent="menu_ventas_viajes"
+        sequence="70"
+    />
+    
+    <menuitem 
+        id="menu_pagos_deuda" 
+        name="Pagos de Deudas" 
+        parent="menu_ventas_viajes"
+        action="action_pago_deuda"
+        sequence="50"
+    />
+    <!-- Submenú Reportes -->
+    <menuitem 
+        id="menu_reportes" 
+        name="Reportes" 
+        parent="menu_ventas_viajes"
+        sequence="80"
+    />
 </odoo>

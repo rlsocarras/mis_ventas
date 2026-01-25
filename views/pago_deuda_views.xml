@@ -1,93 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Vista árbol para pagos -->
-    <record id="view_pago_tree" model="ir.ui.view">
-        <field name="name">ventas.viajes.pago.tree</field>
-        <field name="model">ventas.viajes.pago</field>
+    <!-- Vista Lista -->
+    <record id="pago_deuda_list_view" model="ir.ui.view">
+        <field name="name">ventas.pago.deuda.list</field>
+        <field name="model">ventas.pago.deuda</field>
         <field name="arch" type="xml">
-            <list string="Pagos Parciales">
-                <field name="fecha"/>
-                <field name="deuda_id" widget="many2one_avatar"/>
-                <field name="monto"/>
+            <list>
+                <field name="deuda_id"/>
+                <field name="persona_id"/>
+                <field name="fecha_pago"/>
+                <field name="monto" widget="monetary"/>
                 <field name="tipo_pago"/>
-                <field name="state" widget="badge"/>
-                <field name="observaciones"/>
             </list>
         </field>
     </record>
-    <!-- Vista formulario para pagos -->
-    <record id="view_pago_form" model="ir.ui.view">
-        <field name="name">ventas.viajes.pago.form</field>
-        <field name="model">ventas.viajes.pago</field>
+
+    <!-- Vista Formulario MÍNIMA -->
+    <record id="pago_deuda_form_view" model="ir.ui.view">
+        <field name="name">ventas.pago.deuda.form</field>
+        <field name="model">ventas.pago.deuda</field>
         <field name="arch" type="xml">
-            <form string="Pago Parcial">
-                <header>
-                    <button name="action_cancelar_pago" string="Cancelar" type="object" states="confirmado" class="btn-secondary"/>
-                    <button name="action_confirmar_pago" string="Confirmar" type="object" states="cancelado" class="btn-primary"/>
-                    <field name="state" widget="statusbar" statusbar_visible="confirmado,cancelado"/>
-                </header>
+            <form>
                 <sheet>
                     <group>
-                        <group>
-                            <field name="deuda_id" widget="many2one_avatar"/>
-                            <field name="persona_id" readonly="1"/>
-                            <field name="viaje_id" readonly="1"/>
-                            <field name="monto"/>
-                            <field name="fecha"/>
-                            <field name="tipo_pago"/>
-                        </group>
-                        <group>
-                            <field name="observaciones" nolabel="1"/>
-                        </group>
+                        <field name="deuda_id"/>
+                        <field name="persona_id" readonly="1"/>
+                        <field name="fecha_pago"/>
+                        <field name="monto"/>
+                        <field name="tipo_pago"/>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
-    <!-- Wizard para pago parcial -->
-    <record id="pago_wizard_form_view" model="ir.ui.view">
-        <field name="name">ventas.viajes.pago.wizard.form</field>
-        <field name="model">ventas.viajes.pago.wizard</field>
+
+    <!-- Búsqueda -->
+    <record id="pago_deuda_search_view" model="ir.ui.view">
+        <field name="name">ventas.pago.deuda.search</field>
+        <field name="model">ventas.pago.deuda</field>
         <field name="arch" type="xml">
-            <form string="Registrar Pago Parcial">
-                <sheet>
-                    <div class="oe_title">
-                        <h1>Registrar Pago Parcial</h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="deuda_id" widget="many2one_avatar" readonly="1"/>
-                            <field name="persona_id" readonly="1"/>
-                            <field name="monto_total" readonly="1"/>
-                            <field name="monto_pagado" readonly="1"/>
-                            <field name="monto_pendiente" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="monto" string="Monto a Pagar" required="1"/>
-                            <field name="fecha" required="1"/>
-                            <field name="tipo_pago" required="1"/>
-                            <field name="observaciones"/>
-                        </group>
-                    </group>
-                    <footer>
-                        <button name="action_confirmar_pago" string="Registrar Pago" type="object" class="btn-primary"/>
-                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
-                    </footer>
-                </sheet>
-            </form>
+            <search>
+                <field name="persona_id"/>
+                <field name="deuda_id"/>
+                <field name="tipo_pago"/>
+                <filter name="filter_este_mes" string="Este Mes" 
+                        domain="[('fecha_pago', '&gt;=', context_today().replace(day=1))]"/>
+            </search>
         </field>
     </record>
-    <!-- Botón en vista de deuda -->
-    <xpath expr="//form[@id='view_ventas_viajes_deuda_form']//header" position="inside">
-        <button name="action_pago_parcial" string="Pago Parcial" type="object" class="btn-primary" 
-           invisible= "'monto_pendiente', '==', '0'"/>
-        <button name="ver_pagos" string="Ver Pagos" type="object" class="btn-secondary"/>
-    </xpath>
-    <!-- Campo en vista de deuda -->
-    <xpath expr="//form[@id='view_ventas_viajes_deuda_form']//field[@name='monto']" position="after">
-        <field name="monto_pagado"/>
-        <field name="monto_pendiente" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-        <field name="porcentaje_pagado" widget="progressbar" options="{'editable': false}"/>
-        <field name="state" widget="progressbar" options="{'editable': false}"/>
-    </xpath>
+
+    <!-- Acción -->
+    <record id="action_pago_deuda" model="ir.actions.act_window">
+        <field name="name">Pagos de Deudas</field>
+        <field name="res_model">ventas.pago.deuda</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="pago_deuda_search_view"/>
+    </record>
 </odoo>

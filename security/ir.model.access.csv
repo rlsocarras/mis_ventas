@@ -1,7 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ventas_viajes_viaje,ventas.viajes.viaje,model_ventas_viajes_viaje,,1,1,1,0
-access_ventas_viajes_producto,ventas.viajes.producto,model_ventas_viajes_producto,,1,1,1,1
-access_ventas_viajes_venta,ventas.viajes.venta,model_ventas_viajes_venta,,1,1,1,1
-access_ventas_viajes_deuda,ventas.viajes.deuda,model_ventas_viajes_deuda,,1,1,1,1
-access_ventas_viajes_persona,ventas.viajes.persona,model_ventas_viajes_persona,,1,1,1,0
-access_ventas_viajes_pago_wizard,ventas.viajes.pago.parcial.wizard,model_ventas_viajes_pago_parcial_wizard,base.group_user,1,0,1,0
+access_ventas_persona,ventas.persona,model_ventas_persona,,1,1,1,1
+access_ventas_producto,ventas.producto,model_ventas_producto,,1,1,1,1
+access_ventas_viaje,ventas.viaje,model_ventas_viaje,,1,1,1,1
+access_ventas_viaje_producto,ventas.viaje.producto,model_ventas_viaje_producto,,1,1,1,1
+access_ventas_venta,ventas.venta,model_ventas_venta,,1,1,1,1
+access_ventas_deuda,ventas.deuda,model_ventas_deuda,,1,1,1,1
+access_ventas_pago_deuda,ventas.pago.deuda,model_ventas_pago_deuda,,1,1,1,1

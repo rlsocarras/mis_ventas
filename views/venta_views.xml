@@ -1,59 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Vista de lista de Ventas -->
-    <record id="view_ventas_viajes_venta_list" model="ir.ui.view">
-        <field name="name">ventas.viajes.venta.list</field>
-        <field name="model">ventas.viajes.venta</field>
+    <!-- Vista Lista -->
+    <record id="venta_list_view" model="ir.ui.view">
+        <field name="name">ventas.venta.list</field>
+        <field name="model">ventas.venta</field>
         <field name="arch" type="xml">
-            <list string="Ventas">
+            <list>
                 <field name="viaje_id"/>
-                <field name="producto_id"/>
-                <field name="cantidad"/>
+                <field name="viaje_producto_id"/>
+                <field name="cantidad" sum="Total cantidad"/>
                 <field name="tipo_pago"/>
-                <field name="monto_total"/>
-                <field name="fecha"/>
-                <field name="es_deuda"/>
+                <field name="total"  sum="Total producto"/>
+                <field name="ganancia"  sum="Total ganacia"/>
+                <field name="fecha_venta"/>
             </list>
         </field>
     </record>
-    <!-- Vista de formulario de Venta -->
-    <record id="view_ventas_viajes_venta_form" model="ir.ui.view">
-        <field name="name">ventas.viajes.venta.form</field>
-        <field name="model">ventas.viajes.venta</field>
+    <!-- Vista Formulario SIMPLIFICADA -->
+    <record id="venta_form_view" model="ir.ui.view">
+        <field name="name">ventas.venta.form</field>
+        <field name="model">ventas.venta</field>
         <field name="arch" type="xml">
-            <form string="Venta">
+            <form>
+                <header>
+                    
+                </header>
                 <sheet>
                     <group>
                         <field name="viaje_id"/>
                     </group>
                     <group>
                         <group>
-                            <field name="fecha"/>
-                        </group>
-                        <group>
-                            <field name="monto_total" readonly="1"/>
-                        </group>
-                    </group>
-                    <group>
-                        <group>
-                            <field name="producto_id"/>
+                            <field name="viaje_producto_id" 
+                                   options="{'no_create': True}"/>
+                            <field name="tipo_pago"/>
+                            <field name="precio_unitario" widget="monetary" readonly="1"/>
                         </group>
                         <group>
                             <field name="cantidad"/>
+                            <field name="total" widget="monetary" readonly="1"/>
+                            <field name="ganancia" widget="monetary" readonly="1"/>
                         </group>
-                    </group>
-                    <group>
-                        <field name="tipo_pago"/>
-                        <field name="es_deuda"/>
+                        
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
-    <!-- Acción para Ventas -->
-    <record id="action_ventas_viajes_venta" model="ir.actions.act_window">
+    <!-- Búsqueda -->
+    <record id="venta_search_view" model="ir.ui.view">
+        <field name="name">ventas.venta.search</field>
+        <field name="model">ventas.venta</field>
+        <field name="arch" type="xml">
+            <search>
+             <!-- Panel de busqueda -->
+                <searchpanel>
+                    <field name="viaje_id"  string="Viajes" icon="fa-building" enable_counters="1" select="multi"/>
+                    <field name="persona_id" string="Personas" icon='fa-user' enable_counters="1"/>
+                    <field name="tipo_pago" string="Tipo de pago" icon='fa-state' enable_counters="1"/>
+                    <field name="viaje_producto_id" string="Producto" icon='fa-product' enable_counters="1"/>
+                </searchpanel>
+                <field name="producto_id"/>
+                <field name="viaje_id"/>
+                <field name="tipo_pago"/>
+                <filter name="filter_deudas" string="Solo Deudas" 
+                        domain="[('tipo_pago', '=', 'deuda')]"/>
+                <filter name="filter_pagadas" string="Pagadas" 
+                        domain="[('tipo_pago', 'in', ['efectivo', 'transferencia'])]"/>
+            </search>
+        </field>
+    </record>
+    <!-- Acción -->
+    <record id="action_venta" model="ir.actions.act_window">
         <field name="name">Ventas</field>
-        <field name="res_model">ventas.viajes.venta</field>
+        <field name="res_model">ventas.venta</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="venta_search_view"/>
+        <field name="context">{'default_tipo_pago': 'efectivo'}</field>
     </record>
 </odoo>

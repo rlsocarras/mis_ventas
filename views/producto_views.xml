@@ -1,32 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Vista de formulario de Producto -->
-    <record id="view_ventas_viajes_producto_form" model="ir.ui.view">
-        <field name="name">ventas.viajes.producto.form</field>
-        <field name="model">ventas.viajes.producto</field>
+    <!-- Vista Lista -->
+    <record id="producto_list_view" model="ir.ui.view">
+        <field name="name">ventas.producto.list</field>
+        <field name="model">ventas.producto</field>
         <field name="arch" type="xml">
-            <form string="Producto">
+            <list>
+                <field name="nombre"/>
+                <field name="descripcion"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Formulario -->
+    <record id="producto_form_view" model="ir.ui.view">
+        <field name="name">ventas.producto.form</field>
+        <field name="model">ventas.producto</field>
+        <field name="arch" type="xml">
+            <form>
                 <sheet>
                     <group>
-                        <group>
-                            <field name="name"/>
-                        </group>
-                        <group>
-                            <field name="cantidad"/>
-                        </group>
+                        <field name="nombre"/>
+                        <field name="descripcion" widget="text"/>
                     </group>
                     
-                    <group>
-                        <group>
-                            <field name="precio_compra"/>
-                           
-                        </group>
-                        <group>
-                             <field name="precio_venta"/>
-                        </group>
-                    </group>
+                    <notebook>
+                        <page string="En Viajes">
+                            <field name="viaje_producto_ids">
+                                <list>
+                                    <field name="viaje_id"/>
+                                    <field name="cantidad"/>
+                                    <field name="precio_compra" widget="monetary"/>
+                                    <field name="precio_venta" widget="monetary"/>
+                                    <field name="cantidad_vendido"/>
+                                    <field name="ganancia_actual" widget="monetary"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
+    </record>
+
+    <!-- Búsqueda -->
+    <record id="producto_search_view" model="ir.ui.view">
+        <field name="name">ventas.producto.search</field>
+        <field name="model">ventas.producto</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="nombre"/>
+                <field name="descripcion"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción -->
+    <record id="action_producto" model="ir.actions.act_window">
+        <field name="name">Productos</field>
+        <field name="res_model">ventas.producto</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="producto_search_view"/>
     </record>
 </odoo>

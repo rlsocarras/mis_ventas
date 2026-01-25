@@ -1,0 +1,33 @@
+📋 TABLA RESUMEN DE REGLAS DE NEGOCIO
+NIVEL 1: VALIDACIONES DE DATOS
+Regla	Modelo	Descripción	Prioridad
+RB-001	Todos	Precios y cantidades > 0	ALTA
+RB-002	ViajeProducto	Precio venta ≥ Precio compra	ALTA
+RB-003	Venta	Fecha venta ≥ Fecha viaje	MEDIA
+RB-004	Deuda	Fecha estimada pago ≥ Hoy	MEDIA
+NIVEL 2: CONTROL DE STOCK Y DISPONIBILIDAD
+Regla	Modelo	Descripción	Fórmula
+RS-001	Venta	No vender más del stock	cantidad ≤ (cantidad - cantidad_vendido)
+RS-002	ViajeProducto	Stock actualizado automático	por_vender = cantidad - cantidad_vendido
+RS-003	Sistema	Bloquear ventas sin stock	Validación en tiempo real
+NIVEL 3: GESTIÓN DE CRÉDITO
+Regla	Modelo	Descripción	Fórmula
+RC-001	Persona	Límite de crédito individual	limite_credito = valor configurado
+RC-002	Venta	Validar nuevo crédito	deuda_actual + nuevo_monto ≤ limite_credito
+RC-003	Sistema	Bloquear ventas a crédito excedidas	Validación previa
+NIVEL 4: GESTIÓN DE PAGOS
+Regla	Modelo	Descripción	Fórmula
+RP-001	PagoDeuda	Pago no excede deuda	monto_pago ≤ monto_pendiente
+RP-002	Deuda	No modificar monto con pagos	Si total_pagado > 0 → Error
+RP-003	Deuda	Estado automático	estado = f(monto_pendiente, fecha)
+NIVEL 5: CÁLCULOS FINANCIEROS
+Regla	Modelo	Descripción	Fórmula
+RF-001	Viaje	Ganancia real	ventas_pagadas + (deudas_pagadas * proporción)
+RF-002	Viaje	Comisiones vendedor	ganancia_real * (comision_%)
+RF-003	Deuda	Días vencimiento	fecha_estimada - hoy
+RF-004	Viaje	ROI (Retorno inversión)	(ganancia_real / total_invertido) * 100
+NIVEL 6: INTEGRIDAD Y AUDITORÍA
+Regla	Modelo	Descripción	Implementación
+RI-001	Todos	No eliminar con dependencias	unlink() con validación
+RI-002	Principales	Auditoría cambios	mail.thread + tracking
+RI-003	Sistema	Fechas creación/modificación	Campos automáticos

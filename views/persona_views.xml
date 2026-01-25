@@ -1,54 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Vista de lista de Personas -->
-    <record id="view_ventas_viajes_persona_list" model="ir.ui.view">
-        <field name="name">ventas.viajes.persona.list</field>
-        <field name="model">ventas.viajes.persona</field>
+    <!-- Vista Lista -->
+    <record id="persona_list_view" model="ir.ui.view">
+        <field name="name">ventas.persona.list</field>
+        <field name="model">ventas.persona</field>
         <field name="arch" type="xml">
-            <list string="Personas">
-                <field name="nombre" width="250px"/>
-                <field name="contacto" width="250px"/>
-                <field name="total_deuda" width="200px"/>
+            <list>
+                <field name="nombre" width="150px"/>
+                <field name="contacto" width="150px"/>
+                <field name="total_deuda" sum="Total deuda" width="150px"/>
+                <field name="total_compras" sum="Total compras" width="150px"/>
             </list>
         </field>
     </record>
-    
-    <!-- Vista de formulario de Persona -->
-    <record id="view_ventas_viajes_persona_form" model="ir.ui.view">
-        <field name="name">ventas.viajes.persona.form</field>
-        <field name="model">ventas.viajes.persona</field>
+
+    <!-- Vista Formulario -->
+    <record id="persona_form_view" model="ir.ui.view">
+        <field name="name">ventas.persona.form</field>
+        <field name="model">ventas.persona</field>
         <field name="arch" type="xml">
-            <form string="Persona">
+            <form>
                 <sheet>
                     <group>
-                        <group>
-                            <field name="nombre"/>
-                            <field name="contacto"/>
-                        </group>
-                        <group>
-                            <field name="total_deuda" readonly="1"/>
-                        </group>
+                        <field name="nombre"/>
+                        <field name="contacto"/>
+                        <field name="total_deuda" widget="monetary" readonly="1"/>
                     </group>
                     
-                    <field name="deuda_ids">
-                        <list>
-                            <field name="viaje_id"/>
-                            <field name="producto_id"/>
-                            <field name="cantidad"/>
-                            <field name="monto"/>
-                            <field name="fecha_estimada_pago"/>
-                            <field name="state"/>
-                        </list>
-                    </field>
+                    <notebook>
+                        <page string="Deudas">
+                            <field name="deudas_ids">
+                                <list>
+                                    <field name="viaje_producto_id"/>
+                                    <field name="monto_total" widget="monetary"/>
+                                    <field name="monto_pendiente" widget="monetary"/>
+                                    <field name="estado" widget="badge"
+                                            decoration-success="estado=='pagado'"
+                                            decoration-warning="estado=='parcial'"
+                                            decoration-danger="estado == 'pendiente' or estado == 'vencida'"/>
+                                    <field name="fecha_estimada_pago"/>
+                                </list>
+                            </field>
+                        </page>
+                        
+                        <page string="Compras">
+                            <field name="ventas_ids">
+                                <list>
+                                    <field name="viaje_id"/>
+                                    <field name="producto_id"/>
+                                    <field name="cantidad"/>
+                                    <field name="total" sum="Total compras"/>
+                                    <field name="fecha_venta"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
     </record>
-    
-    <!-- Acción para Personas -->
-    <record id="action_ventas_viajes_persona" model="ir.actions.act_window">
+
+    <!-- Búsqueda -->
+    <record id="persona_search_view" model="ir.ui.view">
+        <field name="name">ventas.persona.search</field>
+        <field name="model">ventas.persona</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="nombre"/>
+                <field name="contacto"/>
+                <filter name="filter_con_deuda" string="Con Deuda" 
+                        domain="[('total_deuda', '>', 0)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción -->
+    <record id="action_persona" model="ir.actions.act_window">
         <field name="name">Personas</field>
-        <field name="res_model">ventas.viajes.persona</field>
+        <field name="res_model">ventas.persona</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="persona_search_view"/>
     </record>
 </odoo>

@@ -1,51 +1,87 @@
 from odoo import models, fields, api
+from datetime import date
 
 class Venta(models.Model):
-    _name = 'ventas.viajes.venta'
-    _description = 'Registro de Venta'
+    _name = 'ventas.venta'
+    _description = 'Venta'
+    _order = 'fecha_venta desc'
     _rec_name = 'display_name'
 
-    viaje_id = fields.Many2one('ventas.viajes.viaje', string='Viaje', required=True, ondelete='cascade')
-    producto_id = fields.Many2one('ventas.viajes.producto', string='Producto', required=True)
-    
+    viaje_id = fields.Many2one(
+        'ventas.viaje',
+        string='Viaje',
+        required=True,
+        ondelete='cascade'
+    )
+    viaje_producto_id = fields.Many2one(
+        'ventas.viaje.producto',
+        string='Producto del Viaje',
+        required=True,
+        domain="[('viaje_id', '=', viaje_id)]"
+    )
+    producto_id = fields.Many2one(
+        'ventas.producto',
+        string='Producto',
+        related='viaje_producto_id.producto_id',
+        store=True
+    )
     cantidad = fields.Integer(string='Cantidad', required=True, default=1)
+    
+    precio_unitario = fields.Float(
+        string='Precio Unitario',
+        related='viaje_producto_id.precio_venta',
+        store=True
+    )
+    total = fields.Float(
+        string='Total',
+        compute='_compute_total',
+        store=True
+    )
+    ganancia = fields.Float(
+        string='Ganancia',
+        compute='_compute_ganancia',
+        store=True
+    )
     tipo_pago = fields.Selection([
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
-    ], string='Tipo de Pago', default='efectivo', required=True)
+        ('deuda', 'Deuda')
+    ], string='Tipo de Pago', required=True, default='efectivo')
     
-    monto_total = fields.Float(string='Monto Total', compute='_compute_monto_total', store=True, readonly=False)
-    fecha = fields.Date(string='Fecha', default=fields.Date.today)
+    # Campos para deudas
+    persona_id = fields.Many2one(
+        'ventas.persona',
+        string='Persona',
+    )
+    fecha_estimada_pago = fields.Date(string='Fecha Estimada de Pago')
+    deuda_id = fields.Many2one(
+        'ventas.deuda',
+        string='Deuda Asociada',
+        readonly=True
+    )
     
-    # Campos para deuda
-    es_deuda = fields.Boolean(string='Es Deuda')
-    deuda_id = fields.Many2one('ventas.viajes.deuda', string='Deuda Relacionada')
-    state = fields.Selection([
-        ('borrador', 'Borrador'),
-        ('confirmada', 'Confirmada'),
-        ('pagada', 'Pagada'),
-        ('cancelada', 'Cancelada'),
-    ], string='Estado', default='confirmada')
+    fecha_venta = fields.Datetime(
+        string='Fecha de Venta',
+        default=fields.Datetime.now
+    )
     
+    estado = fields.Selection([
+        ('pagado', 'Pagado'),
+        ('deuda', 'Deuda'),
+        ('parcial', 'Pago Parcial')
+    ], string='Estado', compute='_compute_estado', store=True)
+
     display_name = fields.Char(
         string='Nombre Mostrado',
         compute='_compute_display_name',
         store=True
     )
 
-    deuda_parcial_id = fields.Many2one(
-        'ventas.viajes.deuda', 
-        string='Deuda Parcial Pagada',
-        ondelete='set null'
-    )
-
-    observaciones = fields.Text(string='Observaciones')
-
-    @api.depends('producto_id.name', 'viaje_id.name', 'viaje_id.fecha')
+    @api.depends('producto_id.nombre', 'viaje_id.nombre', 'viaje_id.fecha')
     def _compute_display_name(self):
-        """Calcula el nombre mostrado: 'Viaje-Producto (Fecha)'"""
+        """Calcula el nombre mostrado: 'Viaje-Producto-Cantidad (Fecha)'"""
         for producto in self:
-            viaje_nombre = producto.viaje_id.name or 'Sin Viaje'
+            viaje_nombre = producto.viaje_id.nombre or 'Sin Viaje'
             viaje_fecha = producto.viaje_id.fecha or ''
             
             # Formatear fecha si existe
@@ -55,48 +91,74 @@ class Venta(models.Model):
                 fecha_str = ''
             
             # Crear el nombre completo
-            nombre_completo = f"{viaje_nombre} - {producto.producto_id.name}"
+            nombre_completo = f"{viaje_nombre} - {producto.producto_id.nombre}"
             if fecha_str:
                 nombre_completo += f" ({fecha_str})"
             
             producto.display_name = nombre_completo
 
-    # Restricción: cantidad no puede exceder el disponible
-    @api.constrains('cantidad', 'producto_id')
-    def _check_cantidad_disponible(self):
+
+    @api.depends('cantidad', 'precio_unitario')
+    def _compute_total(self):
         for venta in self:
-            if venta.producto_id and (venta.producto_id.cantidad_vendido > venta.producto_id.cantidad):
-                raise models.ValidationError(
-                    f'No hay suficiente stock venta. Solo hay {venta.producto_id.por_vender} unidades disponibles'
-                )
-    
-    @api.depends('cantidad', 'producto_id.precio_venta')
-    def _compute_monto_total(self):
-        """Calcula el monto total automáticamente: cantidad × precio_venta"""
+            venta.total = venta.cantidad * venta.precio_unitario
+
+    @api.depends('cantidad', 'viaje_producto_id.precio_compra', 'precio_unitario')
+    def _compute_ganancia(self):
         for venta in self:
-            if venta.producto_id and venta.cantidad:
-                venta.monto_total = venta.cantidad * venta.producto_id.precio_venta
+            precio_compra = venta.viaje_producto_id.precio_compra
+            venta.ganancia = venta.cantidad * (venta.precio_unitario - precio_compra)
+
+    @api.depends('tipo_pago')
+    def _compute_estado(self):
+        for venta in self:
+            if venta.tipo_pago == 'deuda':
+                venta.estado = 'deuda'
+                # Crear registro de deuda automáticamente
+                if not venta.deuda_id and venta.persona_id:
+                    deuda = self.env['ventas.deuda'].create({
+                        'persona_id': venta.persona_id.id,
+                        'venta_id': venta.id,
+                        'monto_total': venta.total,
+                        'monto_pendiente': venta.total,
+                        'fecha_estimada_pago': venta.fecha_estimada_pago,
+                    })
+                    venta.deuda_id = deuda.id
             else:
-                venta.monto_total = 0.0
-    
-    @api.onchange('producto_id')
-    def _onchange_producto_id(self):
-        """Cuando cambia el producto, actualizar monto"""
-        if self.producto_id:
-            self._compute_monto_total()
-            
-            # Verificar stock disponible
-            if self.cantidad > self.producto_id.por_vender:
-                return {
-                    'warning': {
-                        'title': 'Stock Insuficiente',
-                        'message': f'Solo hay {self.producto_id.por_vender} unidades disponibles. '
-                                  f'Cantidad ajustada a {self.producto_id.por_vender}.'
-                    }
-                }
-                self.cantidad = self.producto_id.por_vender
-    
-    @api.onchange('cantidad')
-    def _onchange_cantidad(self):
-        """Cuando cambia la cantidad, recalcular monto"""
-        self._compute_monto_total()
+                venta.estado = 'pagado'
+
+    @api.onchange('tipo_pago')
+    def _onchange_tipo_pago(self):
+        if self.tipo_pago != 'deuda':
+            self.persona_id = False
+            self.fecha_estimada_pago = False
+
+   
+                
+    @api.constrains('fecha_venta', 'viaje_id')
+    def _check_fecha_venta_vs_viaje(self):
+        for venta in self:
+            if venta.fecha_venta and venta.viaje_id.fecha:
+                if venta.fecha_venta.date() < venta.viaje_id.fecha:
+                    raise models.ValidationError(
+                    'La fecha de venta no puede ser anterior a la fecha del viaje'
+                    )
+                
+def write(self, vals):
+    # No permitir modificar monto_total si ya hay pagos
+    for deuda in self:
+        if 'monto_total' in vals and deuda.total_pagado > 0:
+            raise models.ValidationError(
+                'No se puede modificar el monto total de una deuda que ya tiene pagos registrados'
+            )
+    return super().write(vals)
+
+@api.constrains('monto', 'deuda_id')
+def _check_monto_no_excede_deuda(self):
+    for pago in self:
+        if pago.monto > pago.deuda_id.monto_pendiente:
+            raise models.ValidationError(
+                f'El monto del pago ({pago.monto}) excede el monto pendiente '
+                f'de la deuda ({pago.deuda_id.monto_pendiente})'
+            )
+                
