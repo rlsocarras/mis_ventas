@@ -20,28 +20,52 @@ class Persona(models.Model):
         string='Ventas a Crédito'
     )
     
-    total_deuda = fields.Float(
+    total_deuda_pendiente = fields.Float(
         string='Total Deuda Pendiente',
         compute='_compute_total_deuda',
         store=True
     )
 
 
-    total_compras = fields.Float(
-        string='Total Compras',
+    total_deudas = fields.Float(
+        string='Total Deudas',
         compute='_compute_total_compras',
         store=True
     )
     
-    @api.depends('deudas_ids.monto_pendiente')
+    @api.depends('deudas_ids.monto_pendiente','deudas_ids.monto_total')
     def _compute_total_deuda(self):
         for persona in self:
-            persona.total_deuda = sum(
+            persona.total_deuda_pendiente = sum(
                 persona.deudas_ids.mapped('monto_pendiente')
             )
-    @api.depends('ventas_ids.total')
-    def _compute_total_compras(self):
-        for persona in self:
-            persona.total_compras = sum(
-                persona.ventas_ids.mapped('total')
+            persona.total_deudas = sum(
+                persona.deudas_ids.mapped('monto_total')
             )
+
+    deudas_tags_text = fields.Html(
+    compute='_compute_deudas_tags_text',
+    string="Deudas como Tags",
+    sanitize=False
+    )
+
+    def _compute_deudas_tags_text(self):
+        for record in self:
+            tags = []
+            for deuda in record.deudas_ids:
+                # Crear HTML que parezca tags
+                color = self._get_color_by_estado(deuda.estado)
+                tag = f'<span class="badge bg-{color} me-1 text-white">{deuda.display_name_para_personas}</span>'
+                tags.append(tag)
+        
+            record.deudas_tags_text = ''.join(tags) if tags else "Sin deudas"
+    
+    def _get_color_by_estado(self, estado):
+        colores = {
+            'pagado': 'success',
+            'pendiente': 'danger',
+            'vencida': 'warning',
+            'parcial': 'info'
+        }
+        return colores.get(estado, 'secondary')
+   

@@ -80,6 +80,12 @@ class Deuda(models.Model):
         store=True
     )
 
+    display_name_para_personas = fields.Char(
+        string='Nombre Mostrado',
+        compute='_compute_display_name',
+        store=True
+    )
+
     @api.depends('cantidad', 'viaje_producto_id')
     def _compute_total(self):
         for deuda in self:
@@ -135,12 +141,14 @@ class Deuda(models.Model):
             viaje_nombre = deuda.viaje_id.nombre or 'Sin Viaje'
             persona_nombre = deuda.persona_id.nombre or ''
             producto_nombre = deuda.viaje_producto_id.producto_id.nombre or ''
+            producto_cantidad = deuda.viaje_producto_id.cantidad or '0'
           
             
             # Crear el nombre completo
-            nombre_completo = f"{viaje_nombre} - {persona_nombre}-{producto_nombre}-({deuda.monto_total})"
+            nombre_completo = f"{viaje_nombre} - {persona_nombre} - {producto_nombre} - {producto_cantidad} - ${deuda.monto_total}"
             
             deuda.display_name = nombre_completo
+            deuda.display_name_para_personas = f"{viaje_nombre} - {producto_nombre} - {producto_cantidad} - ${deuda.monto_total}"
 
     @api.constrains('fecha_estimada_pago')
     def _check_fecha_estimada_pago(self):

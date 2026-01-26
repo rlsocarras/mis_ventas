@@ -6,8 +6,8 @@
         <field name="model">ventas.producto</field>
         <field name="arch" type="xml">
             <list>
-                <field name="nombre"/>
-                <field name="descripcion"/>
+                <field name="nombre" width="150"/>
+                <field name="descripcion" width="150"/>
             </list>
         </field>
     </record>
@@ -34,6 +34,28 @@
                                     <field name="precio_venta" widget="monetary"/>
                                     <field name="cantidad_vendido"/>
                                     <field name="ganancia_actual" widget="monetary"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="En Ventas">
+                            <field name="ventas_ids">
+                                <list>
+                                    <field name="viaje_id"/>
+                                    <field name="cantidad"/>
+                                    <field name="total" sum="Total"/>
+                                    <field name="ganancia" sum="Total ganancia"/>
+                                    <field name="tipo_pago"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="En Deudas">
+                            <field name="deudas_ids">
+                                <list>
+                                    <field name="viaje_id"/>
+                                    <field name="persona_id"/>
+                                    <field name="cantidad"/>
+                                    <field name="monto_total" sum="Total"/>
+                                    <field name="monto_pendiente" sum="Total monto pendiente"/>
                                 </list>
                             </field>
                         </page>

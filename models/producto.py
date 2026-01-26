@@ -14,3 +14,13 @@ class Producto(models.Model):
         'producto_id',
         string='En Viajes'
     )
+    ventas_ids = fields.One2many(
+        'ventas.venta',
+        'viaje_producto_id',
+        string='En Ventas',
+        )
+    deudas_ids = fields.One2many(
+        'ventas.deuda',
+        'viaje_producto_id',
+        string='En Deudas',
+        )
