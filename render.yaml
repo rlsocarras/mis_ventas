@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: odoo-ventas
+    name: venta
     env: python
     region: oregon  # o singapore para Latinoamérica
     plan: free
