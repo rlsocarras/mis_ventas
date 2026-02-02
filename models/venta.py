@@ -23,7 +23,8 @@ class Venta(models.Model):
         'ventas.producto',
         string='Producto',
         related='viaje_producto_id.producto_id',
-        store=True
+        store=True,
+        readonly=True
     )
     cantidad = fields.Integer(string='Cantidad', required=True, default=1)
     
@@ -44,8 +45,7 @@ class Venta(models.Model):
     )
     tipo_pago = fields.Selection([
         ('efectivo', 'Efectivo'),
-        ('transferencia', 'Transferencia'),
-        ('deuda', 'Deuda')
+        ('transferencia', 'Transferencia')
     ], string='Tipo de Pago', required=True, default='efectivo')
     
     # Campos para deudas
@@ -76,6 +76,54 @@ class Venta(models.Model):
         compute='_compute_display_name',
         store=True
     )
+
+    tipo_pago_html = fields.Html(
+        string='Tipo de Pago',
+        compute='_compute_tipo_pago_html',
+        store=False,
+        sanitize=False
+    )
+    
+    @api.depends('tipo_pago')
+    def _compute_tipo_pago_html(self):
+        for venta in self:
+            if venta.tipo_pago == 'efectivo':
+                html = '''
+                    <div style="
+                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        color: white;
+                        padding: 4px 12px;
+                        border-radius: 15px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        font-weight: 600;
+                        font-size: 12px;
+                        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+                    ">
+                        <i class="fa fa-money-bill-wave" style="font-size: 11px;"></i>
+                        <span>Efectivo</span>
+                    </div>
+                '''
+            else:  # transferencia
+                html = '''
+                    <div style="
+                        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                        color: white;
+                        padding: 4px 12px;
+                        border-radius: 15px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        font-weight: 600;
+                        font-size: 12px;
+                        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+                    ">
+                        <i class="fa fa-university" style="font-size: 11px;"></i>
+                        <span>Transferencia</span>
+                    </div>
+                '''
+            venta.tipo_pago_html = html
 
     @api.depends('producto_id.nombre', 'viaje_id.nombre', 'viaje_id.fecha')
     def _compute_display_name(self):

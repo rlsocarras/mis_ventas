@@ -28,34 +28,34 @@
                         <page string="En Viajes">
                             <field name="viaje_producto_ids">
                                 <list>
-                                    <field name="viaje_id"/>
-                                    <field name="cantidad"/>
-                                    <field name="precio_compra" widget="monetary"/>
-                                    <field name="precio_venta" widget="monetary"/>
-                                    <field name="cantidad_vendido"/>
-                                    <field name="ganancia_actual" widget="monetary"/>
+                                    <field name="viaje_id" width="150"/>
+                                    <field name="cantidad" width="150"/>
+                                    <field name="precio_compra" sum="Total" width="150"/>
+                                    <field name="precio_venta" widget="monetary" width="150"/>
+                                    <field name="cantidad_vendido" width="150"/>
+                                    <field name="ganancia_actual" sum="Total ganancia" width="150"/>
                                 </list>
                             </field>
                         </page>
                         <page string="En Ventas">
                             <field name="ventas_ids">
                                 <list>
-                                    <field name="viaje_id"/>
-                                    <field name="cantidad"/>
-                                    <field name="total" sum="Total"/>
-                                    <field name="ganancia" sum="Total ganancia"/>
-                                    <field name="tipo_pago"/>
+                                    <field name="viaje_id" width="150"/>
+                                    <field name="cantidad" width="150"/>
+                                    <field name="total" sum="Total" width="150"/>
+                                    <field name="ganancia" sum="Total ganancia" width="150"/>
+                                    <field name="tipo_pago_html" widget="html" width="150"/>
                                 </list>
                             </field>
                         </page>
                         <page string="En Deudas">
                             <field name="deudas_ids">
                                 <list>
-                                    <field name="viaje_id"/>
-                                    <field name="persona_id"/>
-                                    <field name="cantidad"/>
-                                    <field name="monto_total" sum="Total"/>
-                                    <field name="monto_pendiente" sum="Total monto pendiente"/>
+                                    <field name="viaje_id" width="150"/>
+                                    <field name="persona_id" width="150"/>
+                                    <field name="cantidad" width="150"/>
+                                    <field name="monto_total" sum="Total" width="150"/>
+                                    <field name="monto_pendiente" sum="Total monto pendiente" width="150"/>
                                 </list>
                             </field>
                         </page>

@@ -9,7 +9,7 @@
                 <field name="viaje_id"/>
                 <field name="viaje_producto_id"/>
                 <field name="cantidad" sum="Total cantidad"/>
-                <field name="tipo_pago"/>
+                <field name="tipo_pago_html" widget="html" width="150"/>
                 <field name="total"  sum="Total producto"/>
                 <field name="ganancia"  sum="Total ganacia"/>
                 <field name="fecha_venta"/>
@@ -58,7 +58,7 @@
                     <field name="viaje_id"  string="Viajes" icon="fa-building" enable_counters="1" select="multi"/>
                     <field name="persona_id" string="Personas" icon='fa-user' enable_counters="1"/>
                     <field name="tipo_pago" string="Tipo de pago" icon='fa-state' enable_counters="1"/>
-                    <field name="viaje_producto_id" string="Producto" icon='fa-product' enable_counters="1"/>
+                    <field name="producto_id" string="Producto" icon='fa-product' enable_counters="1"/>
                 </searchpanel>
                 <field name="producto_id"/>
                 <field name="viaje_id"/>

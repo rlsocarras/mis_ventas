@@ -6,20 +6,7 @@
         <field name="model">ventas.deuda</field>
         <field name="arch" type="xml">
             <list>
-                <field name="viaje_id"/>
-                <field name="persona_id"/>
-                <field name="viaje_producto_id"/>
-                <field name="cantidad"/>
-                <field name="monto_total" sum="Monto Total"/>
-                <field name="monto_pendiente" sum="Monto Pendiente"/>
-                <field name="total_pagado" sum="Monto Pagado"/>
-                <field name="estado" widget="badge"
-                       decoration-success="estado=='pagado'"
-                       decoration-warning="estado=='parcial'"
-                       decoration-danger="estado == 'pendiente' or estado == 'vencida'"/>
-                <field name="fecha_estimada_pago"/>
-                <field name="dias_vencimiento"/>
-                <button 
+            <button 
                     name="action_registrar_pago" 
                     type="object" 
                     string="Pagar"
@@ -27,6 +14,17 @@
                     icon="fa-money"
                     invisible="monto_pendiente &lt;= 0"
                 />
+                <field name="viaje_id" width="150"/>
+                <field name="persona_id" width="150"/>
+                <field name="viaje_producto_id" width="150"/>
+                <field name="cantidad" width="50"/>
+                <field name="monto_total" sum="Monto Total" width="150"/>
+                <field name="monto_pendiente" sum="Monto Pendiente" width="150"/>
+                <field name="total_pagado" sum="Monto Pagado" width="150"/>
+                
+                <field name="estado_completo_html" widget="html" width="150"/>
+                <field name="fecha_estimada_pago" width="150"/>
+                
             </list>
         </field>
     </record>
@@ -108,7 +106,7 @@
                     <field name="viaje_id"  string="Viajes" icon="fa-building" enable_counters="1" select="multi"/>
                     <field name="persona_id" string="Personas" icon='fa-user' enable_counters="1"/>
                     <field name="estado" string="Estado" icon='fa-state' enable_counters="1" select="multi"/>
-                    <field name="viaje_producto_id" string="Producto" icon='fa-product' enable_counters="1"/>
+                    <field name="producto_id" string="Producto" icon='fa-product' enable_counters="1"/>
                 </searchpanel>
                 <field name="persona_id"/>
                 <field name="viaje_id"/>

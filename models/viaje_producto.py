@@ -66,9 +66,11 @@ class ViajeProducto(models.Model):
                 record.precio_venta - record.precio_compra
             )
 
-    @api.depends('ventas_ids', 'cantidad')
+    @api.depends('ventas_ids', 'cantidad', 'deudas_ids.cantidad')
     def _compute_ventas(self):
+       
         for record in self:
+           
             ventas = record.ventas_ids
             deudas = record.deudas_ids
             record.cantidad_vendido = sum(ventas.mapped('cantidad')) +sum(deudas.mapped('cantidad'))

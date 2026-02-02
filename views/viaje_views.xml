@@ -282,11 +282,7 @@
                                         options="{'decimal_precision': 2}"
                                         sum="Ganancia Total"/>
                                     <!-- Tipo de Pago (100px) -->
-                                    <field name="tipo_pago" widget="badge"
-                                            string="Pago"
-                                            width="100"
-                                            decoration-success="tipo_pago=='efectivo'"
-                                            decoration-warning="tipo_pago=='transferencia'"/>
+                                    <field name="tipo_pago_html" widget="html" width="100"/>
                                     <!-- Fecha Venta (120px) -->
                                     <field name="fecha_venta" 
                                         string="Fecha Venta"
@@ -325,17 +321,6 @@
                         <page string="Deudas">
                             <field name="deudas_ids" >
                                 <list >
-                                    <field name="persona_id" string="Persona" width="200"/>
-                                    <field name="viaje_producto_id" string="Producto" width="150"/>
-                                    <field name="cantidad" string="Cant" width="80" class="text-center"/>
-                                    <field name="monto_total" sum="Total Deuda" string="Total" width="120" class="text-right"/>
-                                    <field name="monto_pendiente" sum="Pendiente Deuda" string="Pendiente" width="120" class="text-right"/>
-                                    <field name="total_pagado" sum="Pagado Deuda" string="Pagado" width="120" class="text-right"/>
-                                    <field name="fecha_estimada_pago" string="Fec. Estimada Pago" width="120" widget="datetime"/>
-                                    <field name="estado" widget="badge"
-                                            decoration-success="estado=='pagado'"
-                                            decoration-warning="estado=='parcial'"
-                                            decoration-danger="estado == 'pendiente' or estado == 'vencida'"/>
                                     <button 
                                         name="action_registrar_pago" 
                                         type="object" 
@@ -343,7 +328,16 @@
                                         class="btn-primary"
                                         icon="fa-money"
                                         invisible="monto_pendiente &lt;= 0"
-                                    />
+                                        width="120"/>
+                                    <field name="persona_id" string="Persona" width="200"/>
+                                    <field name="viaje_producto_id" string="Producto" width="150"/>
+                                    <field name="cantidad" string="Cant" width="80" class="text-center"/>
+                                    <field name="monto_total" sum="Total Deuda" string="Total" width="120" class="text-right"/>
+                                    <field name="monto_pendiente" sum="Pendiente Deuda" string="Pendiente" width="120" class="text-right"/>
+                                    <field name="total_pagado" sum="Pagado Deuda" string="Pagado" width="120" class="text-right"/>
+                                    <field name="fecha_estimada_pago" string="Fec. Estimada Pago" width="120" widget="datetime"/>
+                                    <field name="estado_completo_html" widget="html" width="150"/>
+                                    
                                 </list>
                                 <form>
                                     <header>

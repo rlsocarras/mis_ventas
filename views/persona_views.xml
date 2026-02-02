@@ -28,7 +28,7 @@
                 <templates>
                     <t t-name="kanban-box">
                         <!-- Contenedor principal -->
-                        <div class="oe_kanban_global_click o_kanban_card bg-info">
+                        <div class="oe_kanban_global_click o_kanban_card ">
                             <!-- Encabezado con información básica -->
                             <div class="o_kanban_record_top mb-2">
                                 <strong>
@@ -76,98 +76,10 @@
                                     </small>
                                 </div>
                                 <div class="tags-container">
-                                    <field name="deudas_tags_text" widget="html"/>
+                                    <field name="deudas_tags_text" widget="html" string="deudas"/>
                                 </div>
                             </div>
-                            <!-- Estilos adicionales -->
-                            <t t-name="kanban-box-style">
-                                <style>
-                            .kanban-deudas-section {
-                                min-height: 60px;
-                            }
-                            
-                            .oe_kanban_card {
-                                min-height: 280px;
-                            }
-                            
-                            /* Contenedor de etiquetas */
-                            .custom-deudas-tags .o_field_many2many_tags {
-                                display: flex;
-                                flex-wrap: wrap;
-                                gap: 4px;
-                                max-height: 120px;
-                                overflow-y: auto;
-                                padding: 8px;
-                                background-color: #f8f9fa;
-                                border-radius: 4px;
-                                border: 1px solid #dee2e6;
-                            }
-                            
-                            /* Estilos generales para etiquetas */
-                            .custom-deudas-tags .badge {
-                                font-size: 0.7em;
-                                padding: 4px 8px;
-                                margin: 2px;
-                                display: flex;
-                                align-items: center;
-                                max-width: 100%;
-                                word-break: break-word;
-                            }
-                            
-                            /* COLORES SEGÚN ESTADO */
-                            
-                            /* Pendiente - Rojo */
-                            .custom-deudas-tags .badge[data-color='10'],
-                            .custom-deudas-tags .badge.o_tag_color_10 {
-                                background-color: #dc3545 !important;
-                                color: white !important;
-                                border-color: #dc3545 !important;
-                            }
-                            
-                            /* Parcial - Naranja/Ambar */
-                            .custom-deudas-tags .badge[data-color='3'],
-                            .custom-deudas-tags .badge.o_tag_color_3 {
-                                background-color: #fd7e14 !important;
-                                color: white !important;
-                                border-color: #fd7e14 !important;
-                            }
-                            
-                            /* Pagado - Verde */
-                            .custom-deudas-tags .badge[data-color='1'],
-                            .custom-deudas-tags .badge.o_tag_color_1 {
-                                background-color: #198754 !important;
-                                color: white !important;
-                                border-color: #198754 !important;
-                            }
-                            
-                            /* Vencida - Rojo oscuro */
-                            .custom-deudas-tags .badge[data-color='9'],
-                            .custom-deudas-tags .badge.o_tag_color_9 {
-                                background-color: #8b0000 !important;
-                                color: white !important;
-                                border-color: #8b0000 !important;
-                            }
-                            
-                            /* Otros estados - Gris */
-                            .custom-deudas-tags .badge:not([data-color]) {
-                                background-color: #6c757d !important;
-                                color: white !important;
-                                border-color: #6c757d !important;
-                            }
-                            
-                            /* Iconos dentro de las etiquetas */
-                            .custom-deudas-tags .badge i {
-                                margin-right: 4px;
-                                font-size: 0.8em;
-                            }
-                            
-                            /* Texto dentro de las etiquetas */
-                            .custom-deudas-tags .badge span {
-                                white-space: normal;
-                                line-height: 1.2;
-                            }
-                                </style>
-                            </t>
+                           
                         </div>
                     </t>
                 </templates>

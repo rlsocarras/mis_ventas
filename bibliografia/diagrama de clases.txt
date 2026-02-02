@@ -32,7 +32,7 @@ classDiagram
         +unlink() void
     }
     
-    %% CLASE: PRODUCTO
+    %% CLASE: PRODUCTO (ACTUALIZADA)
     class Producto {
         +String _name = "ventas.producto"
         +String _description = "Producto"
@@ -41,9 +41,16 @@ classDiagram
         # Campos
         +String nombre
         +Text descripcion
+        +Integer total_ventas
+        +Integer total_deudas_pendientes
         
         # Relaciones
         +ViajeProducto[] viaje_producto_ids
+        +Venta[] ventas_ids
+        +Deuda[] deudas_ids
+        
+        # Métodos
+        +_compute_totales_producto() void
     }
     
     %% CLASE INTERMEDIA: VIAJE_PRODUCTO
@@ -101,7 +108,7 @@ classDiagram
         +_compute_total_deuda() void
     }
     
-    %% CLASE: VENTA
+    %% CLASE: VENTA (ACTUALIZADA)
     class Venta {
         +String _name = "ventas.venta"
         +String _description = "Venta"
@@ -119,10 +126,10 @@ classDiagram
         +String estado
         +String display_name
         
-        # Relaciones
+        # Relaciones (ACTUALIZADAS)
         +Viaje viaje_id
         +ViajeProducto viaje_producto_id
-        +Producto producto_id
+        +Producto producto_id (related)  ⬅️ NUEVO: Relación directa
         +Persona persona_id
         +Deuda deuda_id
         
@@ -140,7 +147,7 @@ classDiagram
         +cantidad_disponible
     }
     
-    %% CLASE: DEUDA
+    %% CLASE: DEUDA (ACTUALIZADA)
     class Deuda {
         +String _name = "ventas.deuda"
         +String _description = "Deuda"
@@ -159,10 +166,11 @@ classDiagram
         +Integer dias_vencimiento
         +String display_name
         
-        # Relaciones
+        # Relaciones (ACTUALIZADAS)
         +Persona persona_id
         +ViajeProducto viaje_producto_id
-        +Viaje viaje_id
+        +Producto producto_id (related)  ⬅️ NUEVO: Relación directa
+        +Viaje viaje_id (related)
         +Venta venta_id
         +PagoDeuda[] pagos_ids
         
@@ -190,7 +198,7 @@ classDiagram
         
         # Relaciones
         +Deuda deuda_id
-        +Persona persona_id
+        +Persona persona_id (related)
         
         # Métodos
         +_check_monto_no_excede_deuda() void
@@ -199,7 +207,7 @@ classDiagram
         +monto_positivo
     }
     
-    %% HERENCIAS Y RELACIONES
+    %% RELACIONES PRINCIPALES
     Viaje "1" -- "*" ViajeProducto : contiene
     Producto "1" -- "*" ViajeProducto : aparece_en
     Viaje "1" -- "*" Venta : genera
@@ -211,9 +219,21 @@ classDiagram
     Venta "1" -- "1" Deuda : crea
     Deuda "1" -- "*" PagoDeuda : recibe_pagos
     
-    %% RELACIONES COMPUESTAS
+    %% NUEVAS RELACIONES DIRECTO A PRODUCTO
+    Producto "1" -- "*" Venta : vendido_en  ⬅️ NUEVA
+    Producto "1" -- "*" Deuda : aparece_en_deudas  ⬅️ NUEVA
+    
+    %% RELACIONES COMPUESTAS Y RELATED
     Venta --> ViajeProducto : viaje_producto_id
-    Venta --> Producto : producto_id (related)
+    Venta --> Producto : producto_id (related)  ⬅️ ACTUALIZADA
     Deuda --> ViajeProducto : viaje_producto_id
     Deuda --> Viaje : viaje_id (related)
+    Deuda --> Producto : producto_id (related)  ⬅️ NUEVA
     PagoDeuda --> Persona : persona_id (related)
+    
+    %% FLUJO DE DATOS
+    note for Producto "Acceso directo a:\n- Listado de ventas\n- Listado de deudas\n- Estadísticas en tiempo real"
+    
+    note for Venta "Tiene relación directa\ncon Producto vía campo related"
+    
+    note for Deuda "Tiene relación directa\ncon Producto vía campo related"
