@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: odoo-ventas
+    env: python
+    region: oregon  # o singapore para Latinoamérica
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+    startCommand: python odoo-bin -c odoo.conf
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: odoo-db
+          property: connectionString
+      - key: ADDONS_PATH
+        value: addons,custom_addons
+
+  - type: database
+    name: odoo-db
+    env: postgres
+    region: oregon
+    plan: free
+    databaseName: odoo
+    user: odoo
