@@ -8,9 +8,9 @@ services:
       pip install -r requirements.txt
     startCommand: python odoo-bin -c odoo.conf
     envVars:
-      - key: DATABASE_URL
+      - key: dpg-d60g5uvpm1nc73crkpt0-a
         fromDatabase:
-          name: venta
+          name: venta_pdmw
           property: connectionString
       - key: ADDONS_PATH
         value: addons,custom_addons
