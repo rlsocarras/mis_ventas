@@ -16,9 +16,9 @@ services:
         value: addons,custom_addons
 
   - type: database
-    name: odoo-db
+    name: venta
     env: postgres
     region: oregon
     plan: free
-    databaseName: odoo
-    user: odoo
+    databaseName: venta
+    user: rlsocarras
